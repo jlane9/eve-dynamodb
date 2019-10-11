@@ -9,10 +9,24 @@ from boto3.dynamodb.conditions import Attr, ConditionBase
 
 
 def and_conditions(acc, val):
+    """
+
+    :param acc:
+    :param val:
+    :return:
+    """
+
     return (acc & build_expression(val)) if isinstance(acc, ConditionBase) else build_expression(val)
 
 
 def or_conditions(acc, val):
+    """
+
+    :param acc:
+    :param val:
+    :return:
+    """
+
     return (acc | build_expression(val)) if isinstance(acc, ConditionBase) else build_expression(val)
 
 

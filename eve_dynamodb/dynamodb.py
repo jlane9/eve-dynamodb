@@ -21,6 +21,8 @@ List
 
 
 class DynamoDBResult:
+    """
+    """
 
     def __init__(self, result, **_kwargs):
         self._result = result
@@ -34,6 +36,12 @@ class DynamoDBResult:
             yield item
 
     def count(self, with_limit_and_skip=False, **_kwargs):
+        """
+
+        :param with_limit_and_skip:
+        :param _kwargs:
+        :return:
+        """
 
         # TODO: Figure out what this is?
         if with_limit_and_skip:
@@ -82,6 +90,14 @@ class DynamoDB(DataLayer):
         :param perform_count: whether a document count should be performed and
                               returned to the client.
         """
+
+        args = dict()
+
+        if req and req.max_results:
+            args["limit"] = req.max_results
+
+        if req and req.page > 1:
+            args["skip"] = (req.page - 1) * req.max_results
 
         data_source, filter_, sort, projection = self.datasource(resource)
 
@@ -187,7 +203,23 @@ class DynamoDB(DataLayer):
                             to the database.
         """
 
-        raise NotImplementedError
+        data_source, _, _, _ = self._datasource_ex(resource)
+
+        if isinstance(doc_or_docs, dict):
+            doc_or_docs = [doc_or_docs]
+
+        try:
+
+            table = self.driver.Table(data_source)
+
+            with table.batch_writer() as batch:
+                for doc in doc_or_docs:
+                    batch.put_item(Item=doc)
+
+            # TODO: Return inserted ids
+
+        except BotoCoreClientError as e:
+            abort(400, description=debug_error_message(e.response['Error']['Message']))
 
     def update(self, resource, id_, updates, original):
         """ Updates a collection/table document/row.

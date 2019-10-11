@@ -16,6 +16,8 @@ DOMAIN = {
 settings = {'DOMAIN': DOMAIN}
 app = Eve(settings=settings, data=DynamoDB)
 
-with app.app_context():
-    print(app.data.build_expression({'_id': '1'}, 'actor'))
+table = app.data.driver.Table('actor')
+doc_or_docs = [{'_id': '4', 'fname': 'String'}, {'_id': '6', 'fname': 'Flea'}]
 
+with app.app_context():
+    app.data.insert('actor', doc_or_docs)
