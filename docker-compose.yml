@@ -1,0 +1,7 @@
+version: '3'
+
+services:
+  eve_dynamodb:
+    build: .
+    volumes:
+      - ./eve_dynamodb:/deploy/app/eve_dynamodb
