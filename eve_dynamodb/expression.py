@@ -1,8 +1,19 @@
-"""
+"""expression
+
+.. codeauthor:: John Lane <john.lane93@gmail.com>
+
 """
 
 from functools import reduce
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Attr, ConditionBase
+
+
+def and_conditions(acc, val):
+    return (acc & build_expression(val)) if isinstance(acc, ConditionBase) else build_expression(val)
+
+
+def or_conditions(acc, val):
+    return (acc | build_expression(val)) if isinstance(acc, ConditionBase) else build_expression(val)
 
 
 def build_expression(lookup, parent=None):
@@ -21,11 +32,11 @@ def build_expression(lookup, parent=None):
         '$gt': lambda key, value: Attr(key).gt(value),
         '$gte': lambda key, value: Attr(key).gte(value),
         '$in': lambda key, value: Attr(key).is_in(value),
-        '$nin': lambda key, value: not Attr(key).is_in(value),
+        '$nin': lambda key, value: ~Attr(key).is_in(value),
         '$between': lambda key, value: Attr(key).between(*value),
         '$contains': lambda key, value: Attr(key).contains(value),
         '$exists': lambda key, value: Attr(key).exists() if value else Attr(key).not_exists(),
-        '$size': lambda key, value: Attr(key).size() == value,
+        '$size': lambda key, value: Attr(key).size().eq(value),
         '$startsWith': lambda key, value: Attr(key).begins_with(value),
         '$type': lambda key, value: Attr(key).attribute_type(value),
     }
@@ -43,33 +54,21 @@ def build_expression(lookup, parent=None):
         elif k in logical_operators and isinstance(v, (list, tuple)):
 
             if k == '$not':
-                operations.append(
-                    not reduce(lambda acc, val: acc and build_expression(val) if acc else build_expression(val), v)
-                )
+                operations.append(~reduce(and_conditions, v, None))
 
             elif k == '$and':
-                operations.append(
-                    reduce(lambda acc, val: acc and build_expression(val) if acc else build_expression(val), v)
-                )
+                operations.append(reduce(and_conditions, v, None))
 
             elif k == '$or':
-                operations.append(
-                    reduce(lambda acc, val: acc or build_expression(val) if acc else build_expression(val), v)
-                )
+                operations.append(reduce(or_conditions, v, None))
 
             elif k == '$nor':
-                operations.append(
-                    not reduce(lambda acc, val: acc or build_expression(val) if acc else build_expression(val), v)
-                )
+                operations.append(~reduce(or_conditions, v, None))
 
             elif k == '$xor' and len(v) == 2:
-                operations.append(
-                    (
-                            build_expression(v[0]) and not build_expression(v[1])
-                    ) or (
-                            not build_expression(v[0]) and build_expression(v[1])
-                    )
-                )
+
+                x, y = build_expression(v[0]), build_expression(v[1])
+                operations.append((x & ~y) | (~x & y))
 
             else:
                 raise ValueError("Error: $xor can only be computed against two values at a time")
@@ -77,4 +76,4 @@ def build_expression(lookup, parent=None):
         else:
             operations.append(operator(parent if parent else k, v))
 
-    return reduce(lambda acc, val: acc and val if acc else val, operations)
+    return reduce(lambda acc, val: (acc & val) if acc else val, operations)
