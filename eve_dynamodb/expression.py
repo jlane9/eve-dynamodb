@@ -1,4 +1,4 @@
-"""expression
+"""Build DynamoDB query expressions
 
 .. codeauthor:: John Lane <john.lane93@gmail.com>
 

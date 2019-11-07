@@ -1,4 +1,7 @@
-"""
+"""validation
+
+.. codeauthor:: John Lane <john.lane93@gmail.com>
+
 """
 
 from eve.io.mongo.validation import Validator
@@ -11,6 +14,8 @@ class ValidatorDynamoDB(Validator):
     def _is_value_unique(self, unique, field, value, query):
         """ Validates that a field value is unique
         """
+
+        # TODO: Finish this
 
         """
         if unique:
@@ -34,90 +39,90 @@ class ValidatorDynamoDB(Validator):
         raise NotImplementedError
 
     # Override validation for Mongo fields
-    def _validate_type_objectid(self, field, value):
+    def _validate_type_objectid(self, field: str, value):
         """Validates that a field is a valid objectid
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field objectid is not valid on DynamoDB.")
 
-    def _validate_type_dbref(self, field, value):
+    def _validate_type_dbref(self, field: str, value):
         """Validates that a field is a valid database reference
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field dbref is not valid on DynamoDB.")
 
-    def _validate_type_point(self, field, value):
+    def _validate_type_point(self, field: str, value):
         """Validates that a field is a valid point
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field point is not valid on DynamoDB.")
 
-    def _validate_type_geometrycollection(self, field, value):
+    def _validate_type_geometrycollection(self, field: str, value):
         """Validates that a field is a valid geometry collection
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field geometrycollection is not valid on DynamoDB.")
 
-    def _validate_type_multipolygon(self, field, value):
+    def _validate_type_multipolygon(self, field: str, value):
         """Validates that a field is a valid multi-polygon
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field multipolygon is not valid on DynamoDB.")
 
-    def _validate_type_multilinestring(self, field, value):
+    def _validate_type_multilinestring(self, field: str, value):
         """Validates that a field is a valid multi-line string
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field multilinestring is not valid on DynamoDB.")
 
-    def _validate_type_multipoint(self, field, value):
+    def _validate_type_multipoint(self, field: str, value):
         """Validates that a field is a valid multi point
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field multipoint is not valid on DynamoDB.")
 
-    def _validate_type_polygon(self, field, value):
+    def _validate_type_polygon(self, field: str, value):
         """Validates that a field is a valid polygon
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
 
         self._error(field, "field polygon is not valid on DynamoDB.")
 
-    def _validate_type_linestring(self, field, value):
+    def _validate_type_linestring(self, field: str, value):
         """Validates that a field is a valid line string
 
-        :param field:
+        :param str field: Resource field name
         :param value:
         :return:
         """
