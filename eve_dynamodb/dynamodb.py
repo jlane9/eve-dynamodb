@@ -51,18 +51,13 @@ class DynamoDBResult:
         for item in self._result['Items']:
             yield item
 
-    def count(self, with_limit_and_skip: bool = False, **_kwargs) -> int:
+    def count(self, **_kwargs) -> int:
         """Return a count of all items
 
-        :param bool with_limit_and_skip:
         :param dict _kwargs: Extra arguments
         :return: Count of all items
         :rtype: int
         """
-
-        # TODO: Figure out what this is?
-        if with_limit_and_skip:
-            raise NotImplementedError
 
         return self._result['Count'] if 'Count' not in self._result else 0
 
@@ -134,24 +129,22 @@ class DynamoDB(DataLayer):
         :param dict options: Aggregation options to be considered
         """
 
-        # TODO: Finish this, maybe this isn't supported?
+        # TODO: Finish this, maybe this isn't supported?. Also doc strings
         raise NotImplementedError
 
     def find_one(self, resource: str, req: ParsedRequest, check_auth_value: bool = True,
                  force_auth_field_projection: bool = False, **lookup) -> dict:
-        """Retrieves a single document/record. Consumed when a request hits an item endpoint (`/people/id/`)
+        """Retrieves a single document
 
         :param str resource: Resource being accessed
         :param ParsedRequest req: Contains all the constraints that must be fulfilled in order to satisfy the request
-
         :param bool check_auth_value: Boolean flag indicating if the find operation should consider user-restricted
         resource access. Defaults to ``True``
-
-        :param force_auth_field_projection: a boolean flag indicating if the find operation should always include
+        :param bool force_auth_field_projection: Boolean flag indicating if the find operation should always include
         the user-restricted resource access field (if configured). Defaults to ``False``
-
-        :param lookup: the lookup fields. This will most likely be a record id or, if alternate lookup is
-        supported by the API, the corresponding query
+        :param dict lookup: Lookup query
+        :return: A single document
+        :rtype: dict
         """
 
         client_projection = self._client_projection(req)
@@ -232,6 +225,8 @@ class DynamoDB(DataLayer):
 
         :param str resource: Resource being accessed
         :param (Union[dict, list]) doc_or_docs: JSON document or list of JSON documents to be added to the database
+        :return: A list of ids
+        :rtype: list
         """
 
         id_field = config.DOMAIN[resource]["id_field"]
@@ -256,13 +251,12 @@ class DynamoDB(DataLayer):
             abort(500, description=debug_error_message(e.response['Error']['Message']))
 
     def update(self, resource: str, id_: str, updates: dict, original: dict):
-        """Updates a collection/table document/row.
+        """Updates a collection/table document/row
         :param str resource: Resource being accessed
         :param str id_: The unique id of the document
         :param dict updates: JSON updates to be performed on the database document (or row)
-        :param dict original: Definition of the json document that should be updated.
-        :raise OriginalChangedError:    Raised if the database layer notices a change from the supplied `original`
-                                        parameter
+        :param dict original: Definition of the json document that should be updated
+        :raise OriginalChangedError: Raised if the database layer notices a change from the supplied original parameter
         """
 
         # TODO: Finish this
@@ -270,13 +264,11 @@ class DynamoDB(DataLayer):
 
     def replace(self, resource: str, id_: str, document: dict, original: dict):
         """Replaces a collection/table document/row
-        :param str resource:    Resource being accessed. You should then use the ``datasource``
-                                helper function to retrieve the actual datasource name.
+        :param str resource: Resource being accessed
         :param str id_: The unique id of the document
         :param dict document: The new JSON document
-        :param original: Definition of the json document that should be updated.
-        :raise OriginalChangedError:    Raised if the database layer notices a change from the supplied `original`
-                                        parameter
+        :param original: Definition of the json document that should be updated
+        :raise OriginalChangedError: Raised if the database layer notices a change from the supplied original parameter
         """
 
         # TODO: Finish this
