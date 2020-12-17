@@ -11,7 +11,7 @@ def test_remove_one(server: Eve):
     """Test to ensure dynamo can remove a single record from a resource
 
     :param Eve server: Eve server
-    :return:
+    :raises: AssertionError
     """
 
     with server.app_context():

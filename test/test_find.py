@@ -11,7 +11,7 @@ def test_find_one_raw_by_id(server: Eve):
     """Test to ensure a single record can retrieved by id
 
     :param Eve server: Eve server
-    :return:
+    :raises: AssertionError
     """
 
     with server.app_context():
@@ -26,7 +26,7 @@ def test_find_one_raw_only_by_id(server: Eve):
     """Test to ensure find_one_raw only uses _id for lookup
 
     :param Eve server: Eve server
-    :return:
+    :raises: AssertionError
     """
 
     with server.app_context():

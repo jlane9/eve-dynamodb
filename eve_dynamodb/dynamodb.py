@@ -9,7 +9,7 @@ from botocore.exceptions import ClientError as BotoCoreClientError
 from bson import decimal128, ObjectId
 from bson.dbref import DBRef
 from eve.io.base import DataLayer
-from eve.utils import ParsedRequest, config, debug_error_message, str_to_date
+from eve.utils import ParsedRequest, config, debug_error_message, str_to_date, validate_filters
 from flask import Flask, abort
 import simplejson as json
 
@@ -85,7 +85,6 @@ class DynamoDB(DataLayer):
         """Initialize DynamoDB
 
         :param Flask app: Flask application
-        :return:
         """
 
         self.driver = boto3.resource('dynamodb')
@@ -104,19 +103,42 @@ class DynamoDB(DataLayer):
 
         args = dict()
 
+        spec = self._convert_where_request_to_dict(req)
+        bad_filter = validate_filters(spec, resource)
+        is_soft_delete = config.DOMAIN[resource]["soft_delete"]
+
         if req and req.max_results:
             args["limit"] = req.max_results
 
         if req and req.page > 1:
             args["skip"] = (req.page - 1) * req.max_results
 
-        data_source, filter_, sort, projection = self.datasource(resource)
+        if bad_filter:
+            abort(400, bad_filter)
+
+        if sub_resource_lookup:
+            spec = self.combine_queries(spec, sub_resource_lookup)
+
+        if is_soft_delete and not (req and req.show_deleted and self.query_contains_field(spec, config.DELETED)):
+            spec = self.combine_queries(spec, {config.DELETED: {"$ne": True}})
+
+        client_projection = self._client_projection(req)
+        data_source, spec, projection, sort = self._datasource_ex(resource, spec, client_projection, None)
+
+        if req and req.if_modified_since:
+            spec[config.LAST_UPDATED] = {"$gt": req.if_modified_since}
+
+        if len(spec) > 0:
+            args["filter"] = spec
+
+        if projection:
+            args["projection"] = projection
 
         try:
             table = self.driver.Table(data_source)
 
-            # TODO: Finish this, return count
-            return DynamoDBResult(table.scan()), None
+            result = DynamoDBResult(table.scan(**args))  # TODO: Finish this
+            return result, result.count() if perform_count else None
 
         except BotoCoreClientError as e:
             abort(500, description=debug_error_message(e.response['Error']['Message']))
@@ -289,7 +311,7 @@ class DynamoDB(DataLayer):
             table = self.driver.Table(data_source)
 
             with table.batch_writer() as batch:
-                for item in self.find(resource, sub_resource_lookup=lookup):
+                for item in self.find(resource, sub_resource_lookup=lookup)[0]:
                     batch.delete_item(Key={id_field: item[id_field]})
 
         except BotoCoreClientError as e:
@@ -379,3 +401,20 @@ class DynamoDB(DataLayer):
 
         except BotoCoreClientError as e:
             abort(400, description=debug_error_message(e.response['Error']['Message']))
+
+    @staticmethod
+    def _convert_where_request_to_dict(req: ParsedRequest) -> dict:
+        """Converts the contents of a `ParsedRequest`'s `where` property to a dict
+
+        :param ParsedRequest req: Contains all the constraints that must be fulfilled in order to satisfy the request
+        :return: Where clause from request
+        :rtype: dict
+        """
+
+        if not req or not req.where:
+            return {}
+
+        try:
+            return json.loads(req.where)
+        except json.decoder.JSONDecodeError:
+            abort(400, description=debug_error_message("Unable to parse `where` clause"),)

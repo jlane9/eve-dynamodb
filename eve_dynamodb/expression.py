@@ -11,9 +11,10 @@ from boto3.dynamodb.conditions import Attr, ConditionBase, Key
 def and_attr_conditions(acc: Attr, val: dict) -> ConditionBase:
     """Logically 'AND' conditions together
 
-    :param ConditionBase acc: Condition expression
+    :param Attr acc: Condition expression
     :param dict val: Expression to combine
-    :return:
+    :return: Combined expression
+    :rtype: ConditionBase
     """
 
     return (acc & build_attr_expression(val)) if isinstance(acc, ConditionBase) else build_attr_expression(val)
@@ -24,7 +25,8 @@ def or_attr_conditions(acc: Attr, val: dict) -> ConditionBase:
 
     :param Attr acc: Condition expression
     :param dict val: Expression to combine
-    :return:
+    :return: Combined expression
+    :rtype: ConditionBase
     """
 
     return (acc | build_attr_expression(val)) if isinstance(acc, ConditionBase) else build_attr_expression(val)
@@ -35,7 +37,8 @@ def build_attr_expression(lookup: dict, parent: str = None) -> ConditionBase:
 
     :param dict lookup: Query expression
     :param str parent: Parent key
-    :return:
+    :return: Combined expression
+    :rtype: ConditionBase
     """
 
     operators = {
@@ -98,7 +101,8 @@ def build_key_expression(lookup: dict, parent: str = None) -> ConditionBase:
 
     :param dict lookup: Query expression
     :param str parent: Parent key
-    :return:
+    :return: Combined expression
+    :rtype: ConditionBase
     """
 
     operators = {

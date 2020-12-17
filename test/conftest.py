@@ -12,6 +12,11 @@ from eve_dynamodb.dynamodb import DynamoDB
 
 @pytest.fixture(scope="session")
 def server():
+    """Returns an Eve server instance
+
+    :return: Eve server
+    :rtype: eve.Eve
+    """
 
     settings = {
         'DOMAIN': {

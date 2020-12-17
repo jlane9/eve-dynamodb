@@ -32,7 +32,7 @@ def test_single_attr_expression(query: dict, expectation: Attr):
 
     :param dict query: Query to build expression from
     :param Attr expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_attr_expression(query) == expectation
@@ -67,7 +67,7 @@ def test_attr_compound_expression(query: dict, expectation: Attr):
 
     :param dict query: Query to build expression from
     :param Attr expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_attr_expression(query) == expectation
@@ -85,7 +85,7 @@ def test_attr_expression_with_multiple_conditions(query: dict, expectation: Attr
 
     :param dict query: Query to build expression from
     :param Attr expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_attr_expression(query) == expectation
@@ -106,7 +106,7 @@ def test_attr_expression_logical_operators(query: dict, expectation: Attr):
 
     :param dict query: Query to build expression from
     :param Attr expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_attr_expression(query) == expectation
@@ -127,7 +127,7 @@ def test_single_key_expression(query: dict, expectation: Key):
 
     :param dict query: Query to build expression from
     :param Key expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_key_expression(query) == expectation
@@ -148,7 +148,7 @@ def test_compound_expression(query: dict, expectation: Key):
 
     :param dict query: Query to build expression from
     :param Key expectation: Expected expression
-    :return:
+    :raises: AssertionError
     """
 
     assert build_key_expression(query) == expectation

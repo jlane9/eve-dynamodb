@@ -44,7 +44,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field objectid is not valid on DynamoDB.")
@@ -54,7 +54,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field dbref is not valid on DynamoDB.")
@@ -64,7 +64,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field point is not valid on DynamoDB.")
@@ -74,7 +74,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field geometrycollection is not valid on DynamoDB.")
@@ -84,7 +84,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field multipolygon is not valid on DynamoDB.")
@@ -94,7 +94,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field multilinestring is not valid on DynamoDB.")
@@ -104,7 +104,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field multipoint is not valid on DynamoDB.")
@@ -114,7 +114,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field polygon is not valid on DynamoDB.")
@@ -124,7 +124,7 @@ class ValidatorDynamoDB(Validator):
 
         :param str field: Resource field name
         :param value:
-        :return:
+        :raises: cerberus.errors.ValidationError
         """
 
         self._error(field, "field linestring is not valid on DynamoDB.")
